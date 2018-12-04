@@ -82,10 +82,10 @@ namespace EcommerceCoreAngular
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
-                app.UseWebpackDevMiddleware(new WebpackDevMiddlewareOptions
-                {
-                    HotModuleReplacement = true
-                });
+                //app.UseWebpackDevMiddleware(new WebpackDevMiddlewareOptions
+                //{
+                //    HotModuleReplacement = true
+                //});
             }
             else
             {
@@ -100,13 +100,7 @@ namespace EcommerceCoreAngular
             app.UseStaticFiles();
             /*Adler*/
             app.UseCors("CorsPolicy");
-            app.UseStaticFiles(
-                 new StaticFileOptions()
-                 {
-                     FileProvider = new PhysicalFileProvider(
-                     Path.Combine(Directory.GetCurrentDirectory(), @"ClientApp")),
-                     RequestPath = new PathString("/clientapp")
-                 });
+            app.UseStaticFiles();
             app.UseSession();
             app.UseAuthentication();
             /*Adler*/

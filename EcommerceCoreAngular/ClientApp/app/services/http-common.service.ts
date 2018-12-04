@@ -1,8 +1,7 @@
 ﻿import { Injectable } from "@angular/core";
 import { Http, Response, ResponseContentType, Headers, RequestOptions, RequestOptionsArgs, Request, RequestMethod, URLSearchParams } from "@angular/http";
-//import { Observable } from 'rxjs/Observable';
-//import { Observable } from "rxjs/Rx";
-import { Observable } from 'rxjs/Rx'
+import { Observable } from 'rxjs'
+import { map, catchError } from "rxjs/operators";
 
 
 
@@ -26,12 +25,12 @@ export class HttpCommonService {
             body: JSON.stringify(model)
         })
 
-        return this.http.request(new Request(requestOptions))
-            .map((res: Response) => {
+        return this.http.request(new Request(requestOptions)).pipe(
+            map((res: Response) => {
                 if (res) {
                     return [{ status: res.status, json: res.json() }]
                 }
-            });
+            }));
     }
     requestOptions() {
         let contentType = 'application/json';//"x-www-form-urlencoded";
@@ -58,8 +57,9 @@ export class HttpCommonService {
             //  this.stringifyModel(model),
             model//, this.requestOptions()
         )
-            .map(this.extractData)  //.map((res: Response) => res.json()) 
-            .catch(this.handleError)
+            .pipe(
+                map(this.extractData),  //.map((res: Response) => res.json()) 
+                catchError(this.handleError))
             // .subscribe()
             ;
 
@@ -69,21 +69,22 @@ export class HttpCommonService {
         // let options = new RequestOptions({ headers: headers });
         //let body = JSON.stringify(model);
         return this.http.put(this.apiBaseUrl + apiName, model,
-            this.requestOptions()).map(
-                (res: Response) => res.json()
-            ).catch(this.handleError);//.subscribe();
+            this.requestOptions())
+            .pipe(
+                map((res: Response) => res.json()),
+                catchError(this.handleError));//.subscribe();
     }
     delete(apiName: string, id: number) {
         return this.http.delete(this.apiBaseUrl + apiName + '?id=' + id)
-            .catch(this.handleError);//.subscribe();;
+            .pipe(catchError(this.handleError));//.subscribe();;
     }
 
     getList(apiName: string) {
         return this.http.get(this.apiBaseUrl + apiName, { search: null })
-            .map((res: Response) => {
+            .pipe(map((res: Response) => {
                 console.log(res);
                 return res.json();
-            }).catch(this.handleError);
+            }), catchError(this.handleError));
         /*let myHeaders = new Headers();
             myHeaders.append('Content-Type', 'application/json');
             let myParams = new URLSearchParams();
@@ -98,7 +99,9 @@ export class HttpCommonService {
     getItem(apiName: string, id: number) {
 
         return this.http.get(this.apiBaseUrl + apiName + "?id=" + id, { search: null })
-            .map((responseData) => responseData.json()).catch(this.handleError);
+            .pipe(
+                map((responseData) => responseData.json()),
+                catchError (this.handleError));
     }
 
     private extractData(res: Response) {
